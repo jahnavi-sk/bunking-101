@@ -1,13 +1,28 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Initial state: Off-screen */
+.offscreen {
+    right: -100%; /* Adjust this value based on your needs */
+    opacity: 0;
+    transition: right 1s ease-in-out, opacity 11s ease-in-out;
+  }
+  
+  /* Final state: On-screen */
+  .onscreen {
+    right: auto; /* Adjust this value based on your needs */
+    opacity: 1;
+  }
+  
+  @font-face {
+    font-family: 'Gagalin';
+    src: url('./assets/fonts/Gagalin-Regular.woff2') format('woff2'),
+         url('./assets/fonts/Gagalin-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
