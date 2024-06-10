@@ -116,8 +116,8 @@ export default function Home() {
 
       
 
-    <div className='flex'> 
-            <div id='part1' className={`${isCompact? 'hidden md:block' : 'block'} `} >
+    <div className='md:flex'> 
+            <div id='part1' className={`${isCompact? 'hidden md:block ' : 'block'} `} >
               
 
 
@@ -176,6 +176,7 @@ export default function Home() {
 
     </div>
     
+
 {isCompact && isLogIn && (
     <>
     <div className={`w-7/12 ml-36 transition-opacity duration-1000 flex justify-center ease-in-out ${isAnimating ||!isCompact? 'opacity-0' : 'opacity-100'} bg-box mt-20 mr-8 ml-4  rounded-5xl`}>
