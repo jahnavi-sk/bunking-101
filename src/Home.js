@@ -35,14 +35,12 @@ export default function Home() {
             setTimeout(() => {
               setIsCompact(false);
               setIsLogIn(false)
-            }, 500);
+            }, 200);
           }
           else{
             setIsCompact(true)
             console.log('loggin in buddy!')
             setIsLogIn(true);
-            
-
           }
           // setIsLogIn(true);
           setIsSignUp(false);
@@ -52,7 +50,7 @@ export default function Home() {
             setTimeout(() => {
               setIsCompact(false);
               setIsSignUp(false)
-            }, 500);
+            }, 200);
           }
           else{
             setIsCompact(true);
@@ -80,7 +78,7 @@ export default function Home() {
       setIsAnimating(true);
       setTimeout(() => {
         setIsAnimating(false);
-      }, 1000); // Match this timeout with your animation duration
+      }, 500); // Match this timeout with your animation duration
     };
   
     // useEffect(() => {
@@ -179,13 +177,16 @@ export default function Home() {
 
 {isCompact && isLogIn && (
     <>
-    <div className={`w-7/12 ml-36 transition-opacity duration-1000 flex justify-center ease-in-out ${isAnimating ||!isCompact? 'opacity-0' : 'opacity-100'} bg-box mt-20 mr-8 ml-4  rounded-5xl`}>
+    <div className={`w-7/12 transition-opacity duration-500 flex justify-center ease-in-out ${isAnimating ||!isCompact? 'opacity-0' : 'opacity-100'} bg-box mt-10 md:mt-20 ml-24 md:ml-36 rounded-5xl`}>
     <div className='flex-column'>
+    <div className='flex flex-col items-center justify-center'>
       <div className='text-6xl flex align-text-center' style={{fontFamily:"Gagalin"}}>
         Log In
       </div>
   
     <div className='text-5xl'>Welcome Back</div>
+    </div>
+    <div className='flex-column'>
     <div>username</div>
     <div>line</div>
     <div>password</div>
@@ -196,7 +197,7 @@ export default function Home() {
     <div>
     </div>
     </div>
-
+    </div>
   </div>
     </>
     
@@ -205,7 +206,7 @@ export default function Home() {
 
 {isCompact && isSignUp && (
     <>
-    <div className={`w-7/12 ml-36 transition-opacity duration-1000 flex justify-center ease-in-out ${isAnimating ||!isCompact? 'opacity-0' : 'opacity-100'} bg-box mt-8 md:mt-20 mr-8 ml-4  rounded-5xl`}>
+    <div className={`w-7/12 ml-36 transition-opacity duration-500 flex justify-center ease-in-out ${isAnimating ||!isCompact? 'opacity-0' : 'opacity-100'} bg-box mt-8 md:mt-20 mr-8 ml-4  rounded-5xl`}>
     <div className='flex-column'>
       <div className='text-6xl flex align-text-center' style={{fontFamily:"Gagalin"}}>
 Sign Up     </div>
