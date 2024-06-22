@@ -180,18 +180,23 @@ export default function Home() {
     <div className={`w-7/12 transition-opacity duration-500 flex justify-center ease-in-out ${isAnimating ||!isCompact? 'opacity-0' : 'opacity-100'} bg-box mt-10 md:mt-20 ml-24 md:ml-36 rounded-5xl`}>
     <div className='flex-column'>
     <div className='flex flex-col items-center justify-center'>
-      <div className='text-6xl flex align-text-center' style={{fontFamily:"Gagalin"}}>
+      <div className='text-3xl md:text-6xl flex align-text-center' style={{fontFamily:"Gagalin"}}>
         Log In
       </div>
   
-    <div className='text-5xl'>Welcome Back</div>
+    <div className='mt-1 text-lg md:text-5xl'>Welcome Back</div>
     </div>
     <div className='flex-column'>
-    <div>username</div>
-    <div>line</div>
-    <div>password</div>
-    <div>line</div>
-    <div>forgot password</div>
+    <div className='flex'>
+        <div>username</div>
+        <input type="text"></input>
+      </div>
+    
+      <div className='mt-3 flex'>
+        <div>password</div>
+        <input type="password"></input>
+      </div>    
+    <div className='mt-5 '>forgot password</div>
     <div>log in</div>
     <div>New? Create Account</div>
     <div>
