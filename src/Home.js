@@ -193,7 +193,7 @@ export default function Home() {
       </div>
     
       <div className='mt-3 flex'>
-        <div te>password</div>
+        <div className='text-3xl'>Password</div>
         <input type="password"></input>
       </div>    
     <div className='mt-5 '>forgot password</div>
@@ -217,9 +217,8 @@ export default function Home() {
 Sign Up     </div>
   
     <div className='text-5xl'>Welcome Back</div>
-    <div>username</div>
-    <div>line</div>
-    <div>password</div>
+    <div className='text-3xl'>Username</div>
+    <div className='text-3xl'>Password</div>
     <div>line</div>
     <div>forgot password</div>
     <div>log in</div>
