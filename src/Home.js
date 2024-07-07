@@ -193,10 +193,10 @@ export default function Home() {
       </div>
     
       <div className='mt-3 flex'>
-        <div className='text-3xl'>Password</div>
-        <input type="password"></input>
+        <div className='text-3xl'>Password :</div>
+        <input className='ml-4' type="password"></input>
       </div>    
-    <div className='mt-5 '>forgot password</div>
+    <div className='flex justify-center mt-5 text-lg'>Forgot password ?</div>
     <div>log in</div>
     <div>New? Create Account</div>
     <div>
