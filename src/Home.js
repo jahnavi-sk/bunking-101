@@ -197,7 +197,7 @@ export default function Home() {
         <input className='ml-4' type="password"></input>
       </div>    
     <div className='flex justify-center mt-5 text-lg'>Forgot password ?</div>
-    <div>log in</div>
+    <div>Log in</div>
     <div>New? Create Account</div>
     <div>
     </div>
@@ -213,16 +213,40 @@ export default function Home() {
     <>
     <div className={`w-7/12 ml-36 transition-opacity duration-500 flex justify-center ease-in-out ${isAnimating ||!isCompact? 'opacity-0' : 'opacity-100'} bg-box mt-8 md:mt-20 mr-8 ml-4  rounded-5xl`}>
     <div className='flex-column'>
+    <div className='flex flex-col items-center justify-center'>
+
       <div className='text-6xl flex align-text-center' style={{fontFamily:"Gagalin"}}>
-Sign Up     </div>
-  
-    <div className='text-5xl'>Welcome Back</div>
+Sign Up     
+  </div>
+    <div className='mt-1 text-lg md:text-4xl'>Hi there !</div>
+    </div>
+    {/* <div className='flex-column'> */}
+    <div className='flex-column'>
+    <div className='flex mt-10 '>
+        <div className='text-3xl'>Username : </div>
+        <input className='ml-2' type="text"></input>
+      </div>
+    
+      <div className='mt-3 flex'>
+        <div className='text-3xl'>Password :</div>
+        <input className='ml-4' type="password"></input>
+      </div>    
+    {/* <div className='flex justify-center mt-5 text-lg'>Forgot password ?</div> */}
+    <div>Continue</div>
+    {/* <div>New? Create Account</div> */}
+    <div>
+    </div>
+    </div>
+    {/* <div className='flex mt-10 '>
     <div className='text-3xl'>Username</div>
+    <input className='ml-2' type="text"></input>
+
+    </div>
     <div className='text-3xl'>Password</div>
     <div>line</div>
     <div>forgot password</div>
     <div>log in</div>
-    <div>New? Create Account</div>
+    <div>New? Create Account</div> */}
     <div>
     </div>
     </div>
