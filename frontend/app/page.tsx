@@ -74,7 +74,7 @@ export default function Home() {
     <div className="min-h-screen bg-black/[0.96] bg-grid-white/[0.02] relative overflow-hidden flex items-center justify-center">
       <Spotlight /* spotlight props here */ />
 
-      <div className="p-4 max-w-4xl mx-auto relative z-10 w-full text-center">
+      <div className="p-4 mx-auto relative z-10 w-full text-center">
         { showIntro && (
             <div className="mb-12">
           <h1 className="text-xl md:text-6xl lg:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 leading-tight">
