@@ -27,8 +27,9 @@ export default function SignUp({ onBack }: SignProps) {
 
   const handleAcademicSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Proceed to attendance step
-    setAttendance(subjectNames.map(subject => ({ subject, total: 0, attended: 0 })));
+    // Initialize attendance with only subjects that have names
+    const validSubjects = subjectNames.filter(subject => subject.trim() !== '');
+    setAttendance(validSubjects.map(subject => ({ subject, total: 0, attended: 0 })));
     setStep(3);
   };
 
@@ -47,13 +48,6 @@ export default function SignUp({ onBack }: SignProps) {
     const updated = [...subjectNames];
     updated[index] = value;
     setSubjectNames(updated);
-  };
-
-  const generateEmptyTimetable = () => {
-    const empty = Array(days.length)
-      .fill(null)
-      .map(() => Array(numClassesPerDay).fill(""));
-    setTimetable(empty);
   };
 
   const handleTimetableChange = (dayIdx: number, slotIdx: number, value: string) => {
@@ -131,9 +125,12 @@ export default function SignUp({ onBack }: SignProps) {
               <Label>Password</Label>
               <Input placeholder="••••••••" type="password" />
             </LabelInputContainer>
-            <button className="bg-gradient-to-r from-black to-gray-800 text-white rounded-md py-2 px-6 mt-4 w-full">
+            <button type="submit" className="bg-gradient-to-r from-black to-gray-800 text-white rounded-md py-2 px-6 mt-4 w-full">
               Next →
             </button>
+             <button onClick={onBack} className="text-sm underline text-neutral-500 mt-4">
+        ← Back
+      </button>
           </form>
         </>
       )}
@@ -180,9 +177,7 @@ export default function SignUp({ onBack }: SignProps) {
 
             {/* Right: Timetable */}
             {numClassesPerDay > 0 && (
-              // <div className="flex-1 min-w-0 border p-4 rounded-md bg-neutral-100 dark:bg-neutral-800">
-                <div className="flex-1 min-w-0 border p-4 rounded-md bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-
+              <div className="flex-1 min-w-0 border p-4 rounded-md bg-neutral-100 dark:bg-neutral-800">
                 <h3 className="text-lg font-semibold text-neutral-800 dark:text-neutral-200 mb-4">Weekly Timetable</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -233,7 +228,12 @@ export default function SignUp({ onBack }: SignProps) {
               ← Back
             </button>
             <button
-              onClick={() => setStep(3)}
+              onClick={() => {
+                // Initialize attendance with only valid subjects before moving to step 3
+                const validSubjects = subjectNames.filter(subject => subject.trim() !== '');
+                setAttendance(validSubjects.map(subject => ({ subject, total: 0, attended: 0 })));
+                setStep(3);
+              }}
               className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-md py-2 px-6"
             >
               Next →
@@ -243,55 +243,78 @@ export default function SignUp({ onBack }: SignProps) {
       )}
 
       {step === 3 && (
-        <>
-          <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">Attendance Info</h2>
-           <p className="text-neutral-600 dark:text-neutral-300 text-sm">
-            Just a few more details to complete your setup!
-          </p>
-          <form onSubmit={handleAttendanceSubmit} className="space-y-4">
-            {attendance.map((data, idx) => (
-              <div key={idx} className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 border border-neutral-200 dark:border-neutral-700 rounded-lg">
-                <div className="w-full md:w-1/3 font-semibold text-neutral-800 dark:text-neutral-200">
-                  {data.subject}
-                </div>
-                <div className="w-full md:w-1/3">
-                  <Label>Total Classes</Label>
-                  <Input
-                    type="number"
-                    value={data.total}
-                    min="0"
-                    onChange={(e) => handleAttendanceChange(idx, "total", parseInt(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="w-full md:w-1/3">
-                  <Label>Classes Attended</Label>
-                  <Input
-                    type="number"
-                    value={data.attended}
-                    min="0"
-                    max={data.total}
-                    onChange={(e) => handleAttendanceChange(idx, "attended", parseInt(e.target.value) || 0)}
-                  />
-                </div>
-              </div>
-            ))}
-            <div className="flex justify-between mt-8">
-              <button
-                type="button"
-                onClick={() => setStep(2)}
-                className="bg-gray-500 hover:bg-gray-600 text-white rounded-md py-2 px-6 transition-colors"
-              >
-                ← Back
-              </button>
-              <button
-                type="submit"
-                className="bg-gradient-to-r from-black to-gray-800 hover:from-gray-800 hover:to-black text-white rounded-md py-2 px-6 transition-all"
-              >
-                Finish &rarr;
-              </button>
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">Attendance Information</h2>
+            <p className="text-neutral-600 dark:text-neutral-300 text-sm mt-2">
+              Enter your current attendance details for each subject.
+            </p>
+          </div>
+          
+          {attendance.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-neutral-500 dark:text-neutral-400">
+                No subjects found. Please go back and add subjects first.
+              </p>
             </div>
-          </form>
-        </>
+          ) : (
+            <form onSubmit={handleAttendanceSubmit} className="space-y-4">
+              <div className="space-y-4">
+                {attendance.map((data, idx) => (
+                  <div key={idx} className="p-4 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-neutral-50 dark:bg-neutral-900">
+                    <h3 className="text-lg font-semibold text-neutral-800 dark:text-neutral-200 mb-3">
+                      {data.subject}
+                    </h3>
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <LabelInputContainer className="md:w-1/2">
+                        <Label>Total Classes Conducted</Label>
+                        <Input
+                          type="number"
+                          value={data.total || ''}
+                          min="0"
+                          placeholder="Enter total classes"
+                          onChange={(e) => handleAttendanceChange(idx, "total", parseInt(e.target.value) || 0)}
+                        />
+                      </LabelInputContainer>
+                      <LabelInputContainer className="md:w-1/2">
+                        <Label>Classes Attended</Label>
+                        <Input
+                          type="number"
+                          value={data.attended || ''}
+                          min="0"
+                          max={data.total || undefined}
+                          placeholder="Enter classes attended"
+                          onChange={(e) => handleAttendanceChange(idx, "attended", parseInt(e.target.value) || 0)}
+                        />
+                      </LabelInputContainer>
+                    </div>
+                    {data.total > 0 && (
+                      <div className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+                        Attendance: {data.total > 0 ? Math.round((data.attended / data.total) * 100) : 0}%
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex justify-between pt-6">
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="bg-gray-500 hover:bg-gray-600 text-white rounded-md py-2 px-6 transition-colors"
+                >
+                  ← Back
+                </button>
+                <button
+                  type="submit"
+                  className="bg-gradient-to-r from-black to-gray-800 hover:from-gray-800 hover:to-black text-white rounded-md py-2 px-6 transition-all"
+                >
+                  Complete Setup →
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       )}
     </div>
   );
