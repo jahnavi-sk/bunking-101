@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.7",
-    "@tabler/icons-react": "^3.34.0",
+    "@tabler/icons-react": "^3.34.1",
     "clsx": "^2.1.1",
-    "motion": "^12.18.1",
+    "motion": "^12.23.12",
     "next": "15.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
