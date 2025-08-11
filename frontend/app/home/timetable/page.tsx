@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { IconEdit, IconCheck, IconX } from "@tabler/icons-react";
+import { IconEdit, IconCheck, IconX, IconTrash } from "@tabler/icons-react";
 
 interface ClassSlot {
   subject: string;
@@ -40,6 +40,9 @@ export default function TimetablePage() {
   const [timetable, setTimetable] = useState<TimeTableData>(initialTimetable);
   const [editingCell, setEditingCell] = useState<{ day: string; slot: number } | null>(null);
   const [editValues, setEditValues] = useState<ClassSlot>({ subject: "", teacher: "", room: "" });
+  const [timeSlotsState, setTimeSlotsState] = useState<string[]>(timeSlots);
+  const [editingTimeIndex, setEditingTimeIndex] = useState<number | null>(null);
+  const [newTimeValue, setNewTimeValue] = useState<string>("");
 
   const handleEdit = (day: string, slot: number, currentValues: ClassSlot | null) => {
     setEditingCell({ day, slot });
@@ -61,6 +64,36 @@ export default function TimetablePage() {
 
   const handleCancel = () => {
     setEditingCell(null);
+  };
+
+  // Edit time slot
+  const handleEditTime = (idx: number) => {
+    setEditingTimeIndex(idx);
+    setNewTimeValue(timeSlotsState[idx]);
+  };
+
+  const handleSaveTime = () => {
+    if (editingTimeIndex === null) return;
+    setTimeSlotsState(prev => prev.map((t, i) => i === editingTimeIndex ? newTimeValue : t));
+    setEditingTimeIndex(null);
+    setNewTimeValue("");
+  };
+
+  const handleCancelTime = () => {
+    setEditingTimeIndex(null);
+    setNewTimeValue("");
+  };
+
+  // Remove row
+  const handleRemoveRow = (idx: number) => {
+    setTimeSlotsState(prev => prev.filter((_, i) => i !== idx));
+    setTimetable(prev => {
+      const updated: TimeTableData = {};
+      for (const day of days) {
+        updated[day] = prev[day].filter((_, i) => i !== idx);
+      }
+      return updated;
+    });
   };
 
   return (
@@ -85,10 +118,32 @@ export default function TimetablePage() {
               </tr>
             </thead>
             <tbody>
-              {timeSlots.map((time, slotIndex) => (
+              {timeSlotsState.map((time, slotIndex) => (
                 <tr key={time}>
                   <td className="p-3 border-b border-gray-800 text-gray-400 text-sm whitespace-nowrap">
-                    {time}
+                    {editingTimeIndex === slotIndex ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={newTimeValue}
+                          onChange={e => setNewTimeValue(e.target.value)}
+                          className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-white text-sm"
+                        />
+                        <button onClick={handleSaveTime} className="p-1 bg-green-600 hover:bg-green-700 rounded text-white">
+                          <IconCheck size={16} />
+                        </button>
+                        <button onClick={handleCancelTime} className="p-1 bg-red-600 hover:bg-red-700 rounded text-white">
+                          <IconX size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span>{time}</span>
+                        <button onClick={() => handleEditTime(slotIndex)} className="p-1 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 hover:text-white">
+                          <IconEdit size={14} />
+                        </button>
+                      </div>
+                    )}
                   </td>
                   {days.map(day => {
                     const currentClass = timetable[day][slotIndex];

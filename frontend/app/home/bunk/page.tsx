@@ -21,7 +21,7 @@ interface SubjectAttendance {
 const mockSubjects: SubjectAttendance[] = [
   {
     name: "Data Structures",
-    present: 34,
+    present: 40,
     total: 45,
     todayClasses: [
       { time: "9:00 AM", room: "Room 101" },
@@ -30,7 +30,7 @@ const mockSubjects: SubjectAttendance[] = [
   },
   {
     name: "Operating Systems",
-    present: 28,
+    present: 38,
     total: 40,
     todayClasses: [
       { time: "10:00 AM", room: "Room 102" }
@@ -38,7 +38,7 @@ const mockSubjects: SubjectAttendance[] = [
   },
   {
     name: "Computer Networks",
-    present: 30,
+    present: 35,
     total: 38,
     todayClasses: [
       { time: "11:00 AM", room: "Lab 301" }
@@ -46,7 +46,7 @@ const mockSubjects: SubjectAttendance[] = [
   },
   {
     name: "Database Management",
-    present: 25,
+    present: 33,
     total: 35,
     todayClasses: [
       { time: "3:00 PM", room: "Room 103" }
@@ -54,7 +54,7 @@ const mockSubjects: SubjectAttendance[] = [
   },
   {
     name: "Software Engineering",
-    present: 32,
+    present: 40,
     total: 42,
     todayClasses: [
       { time: "4:00 PM", room: "Room 104" }
@@ -65,10 +65,16 @@ const mockSubjects: SubjectAttendance[] = [
 const MIN_ATTENDANCE = 75; // Minimum required attendance percentage
 
 export default function BunkPage() {
-  const [view, setView] = useState<"week" | "today">("week");
-  const [selectedWeek, setSelectedWeek] = useState(0); // 0 = current week
   const [desiredBunks, setDesiredBunks] = useState(1);
-  const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
+  const [suggestedDays, setSuggestedDays] = useState<number[]>([]);
+  const [warning, setWarning] = useState("");
+
+  // Simulate next 7 days (Mon-Sun)
+  const next7Days = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() + i);
+    return date;
+  });
 
   const calculateAttendancePercentage = (present: number, total: number) => {
     return ((present / total) * 100).toFixed(1);
@@ -99,16 +105,28 @@ export default function BunkPage() {
     return { safe: false, message: "Will go below minimum attendance" };
   };
 
-  const getWeekDates = (weekOffset: number) => {
-    const today = new Date();
-    const monday = new Date(today);
-    monday.setDate(monday.getDate() - monday.getDay() + 1 + (weekOffset * 7));
-    
-    return Array.from({ length: 5 }, (_, i) => {
-      const date = new Date(monday);
-      date.setDate(monday.getDate() + i);
-      return date;
-    });
+  // Calculate which days are safe to miss
+  const handleCalculate = () => {
+    // For demo, assume each day has 1 class per subject
+    let safeDays: number[] = [];
+    for (let i = 0; i < 7; i++) {
+      let allSafe = true;
+      for (const subject of mockSubjects) {
+        const projected = parseFloat(calculateProjectedAttendance(subject.present, subject.total, 1));
+        if (projected < MIN_ATTENDANCE) {
+          allSafe = false;
+          break;
+        }
+      }
+      if (allSafe) safeDays.push(i);
+    }
+    if (safeDays.length < desiredBunks) {
+      setWarning("Not possible to safely miss that many days. Your attendance will fall below minimum threshold.");
+      setSuggestedDays([]);
+    } else {
+      setWarning("");
+      setSuggestedDays(safeDays.slice(0, desiredBunks));
+    }
   };
 
   return (
@@ -116,259 +134,45 @@ export default function BunkPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-6xl mx-auto"
+        className="max-w-2xl mx-auto"
       >
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-white">Bunk Planner</h1>
-          <div className="flex gap-4">
+        <h1 className="text-3xl font-bold text-white mb-8">Bunk Planner</h1>
+        <div className="bg-gray-900 border border-white/20 rounded-lg p-6 mb-8">
+          <label className="text-gray-400 text-sm block mb-2">
+            How many days do you want to miss in the next 7 days?
+          </label>
+          <div className="flex items-end gap-4">
+            <input
+              type="number"
+              min="1"
+              max="7"
+              value={desiredBunks}
+              onChange={e => setDesiredBunks(Math.min(7, Math.max(1, parseInt(e.target.value) || 1)))}
+              className="w-20 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+            />
             <button
-              onClick={() => setView("week")}
-              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                view === "week" 
-                  ? "bg-blue-600 text-white" 
-                  : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-              }`}
+              onClick={handleCalculate}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
             >
-              <IconCalendar size={20} />
-              Week View
-            </button>
-            <button
-              onClick={() => setView("today")}
-              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                view === "today" 
-                  ? "bg-blue-600 text-white" 
-                  : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-              }`}
-            >
-              <IconClock size={20} />
-              Today View
+              Suggest Days
             </button>
           </div>
         </div>
-
-        {view === "week" ? (
-          <div className="space-y-6">
-            <div className="bg-gray-900 border border-white/20 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-6">
-                <button
-                  onClick={() => setSelectedWeek(prev => prev - 1)}
-                  className="p-2 text-white hover:bg-gray-800 rounded-lg transition-colors"
-                  disabled={selectedWeek === 0}
-                >
-                  <IconChevronLeft size={20} />
-                </button>
-                
-                <h2 className="text-xl font-bold text-white">
-                  {selectedWeek === 0 ? "This Week" : 
-                   selectedWeek === 1 ? "Next Week" :
-                   `Week of ${getWeekDates(selectedWeek)[0].toLocaleDateString()}`}
-                </h2>
-                
-                <button
-                  onClick={() => setSelectedWeek(prev => prev + 1)}
-                  className="p-2 text-white hover:bg-gray-800 rounded-lg transition-colors"
-                >
-                  <IconChevronRight size={20} />
-                </button>
-              </div>
-
-              <div className="mb-6">
-                <label className="text-gray-400 text-sm block mb-2">
-                  How many days do you want to skip this week?
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="5"
-                  value={desiredBunks}
-                  onChange={(e) => setDesiredBunks(Math.min(5, Math.max(1, parseInt(e.target.value) || 1)))}
-                  className="w-20 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
-                />
-              </div>
-
-              <div className="grid grid-cols-5 gap-4">
-                {getWeekDates(selectedWeek).map((date, index) => {
-                  const isToday = date.toDateString() === new Date().toDateString();
-                  const isPast = date < new Date();
-
-                  return (
-                    <div 
-                      key={index}
-                      className={`
-                        p-4 rounded-lg border
-                        ${isPast ? 'bg-gray-800 border-gray-700 opacity-50' : 'bg-gray-800 border-gray-700'}
-                        ${isToday ? 'border-blue-500' : ''}
-                      `}
-                    >
-                      <div className="text-sm text-gray-400 mb-1">
-                        {date.toLocaleDateString('en-US', { weekday: 'short' })}
-                      </div>
-                      <div className="text-lg text-white mb-2">
-                        {date.getDate()}
-                      </div>
-                      {!isPast && (
-                        <div className="text-sm">
-                          {index % 2 === 0 ? (
-                            <span className="text-green-400">Good day to skip</span>
-                          ) : (
-                            <span className="text-red-400">Important classes</span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="bg-gray-900 border border-white/20 rounded-lg p-6">
-              <h3 className="text-xl font-bold text-white mb-4">Attendance Impact Analysis</h3>
-              <div className="space-y-4">
-                {mockSubjects.map((subject, index) => {
-                  const currentPercentage = parseFloat(calculateAttendancePercentage(subject.present, subject.total));
-                  const projectedPercentage = parseFloat(calculateProjectedAttendance(subject.present, subject.total, 2));
-                  const colorClass = getAttendanceColor(currentPercentage);
-                  const projectedColorClass = getAttendanceColor(projectedPercentage);
-
-                  return (
-                    <div key={index} className="bg-gray-800 p-4 rounded-lg">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h4 className="text-white font-medium">{subject.name}</h4>
-                          <p className="text-sm text-gray-400">
-                            Current: {subject.present}/{subject.total} classes
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <div className={`text-lg font-semibold ${colorClass}`}>
-                            {currentPercentage}%
-                          </div>
-                          <div className={`text-sm ${projectedColorClass}`}>
-                            After bunks: {projectedPercentage}%
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+        {warning && (
+          <div className="bg-red-900 border border-red-400 rounded-lg p-4 text-red-200 mb-4">
+            {warning}
           </div>
-        ) : (
-          <div className="space-y-6">
-            <div className="bg-gray-900 border border-white/20 rounded-lg p-6">
-              <h3 className="text-xl font-bold text-white mb-4">Today's Classes</h3>
-              <div className="space-y-4">
-                {mockSubjects.map((subject, index) => {
-                  const recommendation = getBunkRecommendation(subject);
-                  
-                  return subject.todayClasses.map((cls, classIndex) => {
-                    const isSelected = selectedClasses.includes(`${index}-${classIndex}`);
-                    
-                    return (
-                      <div 
-                        key={`${index}-${classIndex}`}
-                        className={`
-                          bg-gray-800 p-4 rounded-lg border-2 transition-colors cursor-pointer
-                          ${isSelected ? 'border-blue-500' : 'border-transparent'}
-                          hover:border-blue-500/50
-                        `}
-                        onClick={() => {
-                          const key = `${index}-${classIndex}`;
-                          setSelectedClasses(prev => 
-                            prev.includes(key) 
-                              ? prev.filter(k => k !== key)
-                              : [...prev, key]
-                          );
-                        }}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="text-white font-medium">{subject.name}</h4>
-                              {recommendation.safe ? (
-                                <IconCheck size={16} className="text-green-400" />
-                              ) : (
-                                <IconAlertTriangle size={16} className="text-red-400" />
-                              )}
-                            </div>
-                            <p className="text-sm text-gray-400">
-                              {cls.time} • {cls.room}
-                            </p>
-                            <p className="text-sm text-gray-400">
-                              Current attendance: {calculateAttendancePercentage(subject.present, subject.total)}%
-                            </p>
-                          </div>
-                          <div className="text-sm">
-                            <span className={recommendation.safe ? "text-green-400" : "text-red-400"}>
-                              {recommendation.message}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  });
-                })}
-              </div>
-            </div>
-
-            {selectedClasses.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-gray-900 border border-white/20 rounded-lg p-6"
-              >
-                <h3 className="text-xl font-bold text-white mb-4">Selected Classes to Skip</h3>
-                <div className="space-y-2">
-                  {selectedClasses.map(key => {
-                    const [subjectIndex, classIndex] = key.split('-').map(Number);
-                    const subject = mockSubjects[subjectIndex];
-                    const cls = subject.todayClasses[classIndex];
-
-                    return (
-                      <div key={key} className="flex justify-between items-center bg-gray-800 p-3 rounded-lg">
-                        <div>
-                          <div className="text-white">{subject.name}</div>
-                          <div className="text-sm text-gray-400">{cls.time} • {cls.room}</div>
-                        </div>
-                        <button
-                          onClick={() => setSelectedClasses(prev => prev.filter(k => k !== key))}
-                          className="text-red-400 hover:text-red-300"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="mt-4 pt-4 border-t border-gray-700">
-                  <div className="text-gray-400">
-                    Impact on attendance if you skip these classes:
-                  </div>
-                  {Array.from(new Set(selectedClasses.map(key => key.split('-')[0]))).map(subjectIndex => {
-                    const subject = mockSubjects[Number(subjectIndex)];
-                    const skippedClasses = selectedClasses.filter(key => key.startsWith(subjectIndex)).length;
-                    const currentPercentage = parseFloat(calculateAttendancePercentage(subject.present, subject.total));
-                    const projectedPercentage = parseFloat(calculateProjectedAttendance(subject.present, subject.total, skippedClasses));
-                    
-                    return (
-                      <div key={subjectIndex} className="flex justify-between items-center mt-2">
-                        <span className="text-white">{subject.name}</span>
-                        <div className="flex items-center gap-2">
-                          <span className={getAttendanceColor(currentPercentage)}>
-                            {currentPercentage}%
-                          </span>
-                          <span className="text-gray-400">→</span>
-                          <span className={getAttendanceColor(projectedPercentage)}>
-                            {projectedPercentage}%
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
+        )}
+        {suggestedDays.length > 0 && (
+          <div className="bg-black border border-white/20 rounded-lg p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">You can safely miss these days:</h2>
+            <ul className="space-y-2">
+              {suggestedDays.map(idx => (
+                <li key={idx} className="text-white">
+                  {next7Days[idx].toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </motion.div>
